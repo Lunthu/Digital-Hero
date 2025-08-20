@@ -1,0 +1,1180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Hero - Agency Management Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .game-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .game-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: rgba(255,255,255,0.95);
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .stat-card h3 {
+            color: #5a67d8;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #2d3748;
+        }
+
+        .game-board {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .section {
+            background: rgba(255,255,255,0.95);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            color: #5a67d8;
+            margin-bottom: 15px;
+            text-align: center;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 10px;
+        }
+
+        .card {
+            background: #f7fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .card:hover {
+            border-color: #5a67d8;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .employee-card {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .employee-info h4 {
+            color: #2d3748;
+            margin-bottom: 5px;
+        }
+
+        .skills {
+            font-size: 0.85rem;
+            color: #666;
+        }
+
+        .project-card h4 {
+            color: #2d3748;
+            margin-bottom: 8px;
+        }
+
+        .project-details {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .progress-bar {
+            background: #e2e8f0;
+            border-radius: 10px;
+            height: 8px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, #48bb78, #38a169);
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #5a67d8, #667eea);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .btn:disabled {
+            background: #a0aec0;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .event-popup {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .event-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 500px;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+
+        .event-title {
+            font-size: 1.5rem;
+            color: #5a67d8;
+            margin-bottom: 15px;
+        }
+
+        .event-choices {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .choice-btn {
+            background: #f7fafc;
+            border: 2px solid #e2e8f0;
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .choice-btn:hover {
+            border-color: #5a67d8;
+            background: #edf2f7;
+        }
+
+        .log {
+            background: rgba(255,255,255,0.95);
+            border-radius: 10px;
+            padding: 15px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .log-entry {
+            padding: 5px 0;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 0.9rem;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .tender-section {
+            grid-column: 1 / -1;
+        }
+
+        .tender-card {
+            background: linear-gradient(135deg, #ffd89b 0%, #19547b 100%);
+            color: white;
+            border: none;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .competency-badge {
+            display: inline-block;
+            background: #5a67d8;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            margin: 2px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+
+        .small-btn {
+            background: #5a67d8;
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            cursor: pointer;
+        }
+
+        .small-btn:hover {
+            background: #4c51bf;
+        }
+
+        @media (max-width: 768px) {
+            .game-board {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="header">
+            <h1>🚀 Digital Hero</h1>
+            <p>Manage your digital agency and become the industry leader!</p>
+        </div>
+
+        <div class="game-stats">
+            <div class="stat-card">
+                <h3>Week</h3>
+                <div class="stat-value" id="week">1</div>
+            </div>
+            <div class="stat-card">
+                <h3>Budget</h3>
+                <div class="stat-value" id="budget">$50,000</div>
+            </div>
+            <div class="stat-card">
+                <h3>Reputation</h3>
+                <div class="stat-value" id="reputation">50</div>
+            </div>
+            <div class="stat-card">
+                <h3>Employees</h3>
+                <div class="stat-value" id="employeeCount">3</div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="btn" onclick="nextWeek()">⏭️ Next Week</button>
+            <button class="btn" onclick="showHiring()">👥 Hire Employee</button>
+            <button class="btn" onclick="showTender()" id="tenderBtn" disabled>🏆 Join Tender (Week 4)</button>
+            <button class="btn" onclick="startAgencyProject()">🔬 Start Agency Project</button>
+        </div>
+
+        <div class="game-board">
+            <div class="section">
+                <h2 class="section-title">👥 Employees</h2>
+                <div id="employees"></div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">📋 Active Projects</h2>
+                <div id="projects"></div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">📬 Available Briefs</h2>
+                <div id="briefs"></div>
+            </div>
+
+            <div class="section tender-section" id="tenderSection" style="display: none;">
+                <h2 class="section-title">🏆 Tender Opportunity</h2>
+                <div id="tender"></div>
+            </div>
+        </div>
+
+        <div class="log">
+            <h3 style="margin-bottom: 10px; color: #5a67d8;">📜 Agency Log</h3>
+            <div id="gameLog"></div>
+        </div>
+    </div>
+
+    <!-- Event Popup -->
+    <div id="eventPopup" class="event-popup hidden">
+        <div class="event-content">
+            <h2 class="event-title" id="eventTitle"></h2>
+            <p id="eventDescription"></p>
+            <div class="event-choices" id="eventChoices"></div>
+        </div>
+    </div>
+
+    <!-- Hiring Modal -->
+    <div id="hiringModal" class="event-popup hidden">
+        <div class="event-content">
+            <h2 class="event-title">Available Candidates</h2>
+            <div id="candidates"></div>
+            <button class="btn" onclick="closeHiring()" style="margin-top: 15px;">Close</button>
+        </div>
+    </div>
+
+    <!-- Tender Modal -->
+    <div id="tenderModal" class="event-popup hidden">
+        <div class="event-content">
+            <h2 class="event-title">Tender Challenge</h2>
+            <p id="tenderDescription"></p>
+            <div id="tenderGuess"></div>
+            <div class="event-choices" id="tenderChoices"></div>
+        </div>
+    </div>
+
+    <script>
+        // Game State
+        let gameState = {
+            week: 1,
+            budget: 50000,
+            reputation: 50,
+            employees: [],
+            projects: [],
+            briefs: [],
+            clients: [],
+            eventStack: [],
+            goals: {
+                superProduct: false,
+                lastAgency: false,
+                superRevenue: false,
+                mergeWithClient: false,
+                closeAgency: false
+            }
+        };
+
+        // Competencies
+        const competencies = ['Frontend', 'Backend', 'Design', 'Marketing', 'Analytics', 'DevOps', 'Mobile', 'AI/ML'];
+        const softSkills = ['Leadership', 'Communication', 'Creativity', 'Problem Solving', 'Teamwork'];
+
+        // Initialize game
+        function initGame() {
+            // Create initial employees
+            gameState.employees = [
+                createEmployee('Alex Johnson', ['Frontend', 'Design'], ['Leadership', 'Creativity']),
+                createEmployee('Sarah Chen', ['Backend', 'DevOps'], ['Problem Solving', 'Teamwork']),
+                createEmployee('Mike Rodriguez', ['Marketing', 'Analytics'], ['Communication', 'Leadership'])
+            ];
+
+            // Create initial briefs
+            generateBriefs();
+            
+            // Initialize event stack
+            initializeEventStack();
+            
+            updateDisplay();
+            logEvent('Welcome to Digital Hero! Your agency journey begins...');
+        }
+
+        function createEmployee(name, skills, softSkills) {
+            return {
+                id: Math.random().toString(36).substr(2, 9),
+                name: name || generateRandomName(),
+                competencies: skills || getRandomSkills(2),
+                softSkills: softSkills || getRandomSoftSkills(2),
+                salary: Math.floor(Math.random() * 3000) + 2000,
+                assignedProject: null,
+                motivation: Math.floor(Math.random() * 20) + 80
+            };
+        }
+
+        function generateRandomName() {
+            const firstNames = ['Alex', 'Sarah', 'Mike', 'Emma', 'John', 'Lisa', 'David', 'Amy', 'Chris', 'Nicole'];
+            const lastNames = ['Johnson', 'Chen', 'Rodriguez', 'Smith', 'Wilson', 'Brown', 'Davis', 'Miller', 'Garcia', 'Taylor'];
+            return firstNames[Math.floor(Math.random() * firstNames.length)] + ' ' + 
+                   lastNames[Math.floor(Math.random() * lastNames.length)];
+        }
+
+        function getRandomSkills(count) {
+            const shuffled = [...competencies].sort(() => 0.5 - Math.random());
+            return shuffled.slice(0, count);
+        }
+
+        function getRandomSoftSkills(count) {
+            const shuffled = [...softSkills].sort(() => 0.5 - Math.random());
+            return shuffled.slice(0, count);
+        }
+
+        function generateBriefs() {
+            gameState.briefs = [];
+            const briefCount = Math.floor(Math.random() * 3) + 2;
+            
+            for (let i = 0; i < briefCount; i++) {
+                const requiredSkills = getRandomSkills(Math.floor(Math.random() * 3) + 1);
+                const duration = Math.floor(Math.random() * 4) + 2;
+                const basePayment = duration * 8000 + Math.floor(Math.random() * 5000);
+                
+                gameState.briefs.push({
+                    id: Math.random().toString(36).substr(2, 9),
+                    title: generateProjectTitle(),
+                    requiredSkills: requiredSkills,
+                    duration: duration,
+                    payment: basePayment,
+                    deadline: gameState.week + duration + 1
+                });
+            }
+        }
+
+        function generateProjectTitle() {
+            const types = ['Website Redesign', 'Mobile App', 'E-commerce Platform', 'Analytics Dashboard', 'Marketing Campaign', 'Brand Identity', 'API Development', 'Cloud Migration'];
+            const companies = ['TechCorp', 'StartupX', 'MegaRetail', 'FinanceFlow', 'HealthPlus', 'EduLearn', 'GreenEnergy', 'FoodChain'];
+            return `${types[Math.floor(Math.random() * types.length)]} for ${companies[Math.floor(Math.random() * companies.length)]}`;
+        }
+
+        function acceptBrief(briefId) {
+            const brief = gameState.briefs.find(b => b.id === briefId);
+            if (!brief) return;
+
+            // Check if we have required skills
+            const availableSkills = gameState.employees
+                .filter(emp => !emp.assignedProject)
+                .flatMap(emp => emp.competencies);
+            
+            const hasRequiredSkills = brief.requiredSkills.every(skill => 
+                availableSkills.includes(skill)
+            );
+
+            if (!hasRequiredSkills) {
+                logEvent(`❌ Cannot accept "${brief.title}" - missing required skills: ${brief.requiredSkills.join(', ')}`);
+                return;
+            }
+
+            // Convert to project
+            const project = {
+                id: brief.id,
+                title: brief.title,
+                requiredSkills: brief.requiredSkills,
+                totalDuration: brief.duration,
+                remainingDuration: brief.duration,
+                payment: brief.payment,
+                deadline: brief.deadline,
+                assignedEmployees: [],
+                status: 'active'
+            };
+
+            gameState.projects.push(project);
+            gameState.briefs = gameState.briefs.filter(b => b.id !== briefId);
+            
+            logEvent(`✅ Accepted project: "${project.title}" - Payment: $${project.payment.toLocaleString()}`);
+            updateDisplay();
+        }
+
+        function assignEmployee(employeeId, projectId) {
+            const employee = gameState.employees.find(e => e.id === employeeId);
+            const project = gameState.projects.find(p => p.id === projectId);
+            
+            if (!employee || !project || employee.assignedProject) return;
+
+            employee.assignedProject = projectId;
+            project.assignedEmployees.push(employeeId);
+            
+            logEvent(`👤 ${employee.name} assigned to "${project.title}"`);
+            updateDisplay();
+        }
+
+        function unassignEmployee(employeeId) {
+            const employee = gameState.employees.find(e => e.id === employeeId);
+            if (!employee || !employee.assignedProject) return;
+
+            const project = gameState.projects.find(p => p.id === employee.assignedProject);
+            if (project) {
+                project.assignedEmployees = project.assignedEmployees.filter(id => id !== employeeId);
+            }
+            
+            employee.assignedProject = null;
+            logEvent(`👤 ${employee.name} unassigned from project`);
+            updateDisplay();
+        }
+
+        function developSkill(employeeId) {
+            const employee = gameState.employees.find(e => e.id === employeeId);
+            if (!employee || gameState.budget < 1000) return;
+
+            gameState.budget -= 1000;
+            
+            // Roll dice for success
+            const roll = Math.floor(Math.random() * 6) + 1;
+            if (roll >= 4) {
+                const newSkill = competencies[Math.floor(Math.random() * competencies.length)];
+                if (!employee.competencies.includes(newSkill)) {
+                    employee.competencies.push(newSkill);
+                    logEvent(`🎲 ${employee.name} learned ${newSkill}! (Rolled: ${roll})`);
+                } else {
+                    logEvent(`🎲 ${employee.name} reinforced ${newSkill} skills (Rolled: ${roll})`);
+                }
+            } else {
+                logEvent(`🎲 ${employee.name}'s training was unsuccessful (Rolled: ${roll})`);
+            }
+            
+            updateDisplay();
+        }
+
+        function fireEmployee(employeeId) {
+            const employee = gameState.employees.find(e => e.id === employeeId);
+            if (!employee) return;
+
+            // Unassign from project first
+            if (employee.assignedProject) {
+                unassignEmployee(employeeId);
+            }
+
+            gameState.employees = gameState.employees.filter(e => e.id !== employeeId);
+            logEvent(`❌ ${employee.name} was dismissed from the agency`);
+            updateDisplay();
+        }
+
+        function nextWeek() {
+            gameState.week++;
+
+            // Process projects
+            processProjects();
+            
+            // Pay salaries
+            const totalSalaries = gameState.employees.reduce((sum, emp) => sum + emp.salary, 0);
+            gameState.budget -= totalSalaries;
+            
+            // Generate new briefs occasionally
+            if (Math.random() < 0.7) {
+                generateBriefs();
+            }
+
+            // Check for tender
+            if (gameState.week % 4 === 0) {
+                document.getElementById('tenderBtn').disabled = false;
+                document.getElementById('tenderBtn').textContent = '🏆 Join Tender (Available!)';
+            }
+
+            // Trigger random event
+            // if (gameState.eventStack.length > 0 && Math.random() < 0.6) {
+            //     triggerEvent();
+            // }
+
+            logEvent(`📅 Week ${gameState.week} begins. Salaries paid: $${totalSalaries.toLocaleString()}`);
+            updateDisplay();
+        }
+
+        function processProjects() {
+            gameState.projects.forEach(project => {
+                if (project.assignedEmployees.length > 0) {
+                    // Calculate progress based on assigned employees
+                    const skillMatch = project.requiredSkills.filter(skill =>
+                        project.assignedEmployees.some(empId => {
+                            const emp = gameState.employees.find(e => e.id === empId);
+                            return emp && emp.competencies.includes(skill);
+                        })
+                    ).length;
+
+                    const efficiency = (skillMatch / project.requiredSkills.length) * project.assignedEmployees.length;
+                    project.remainingDuration -= Math.max(0.5, efficiency);
+
+                    if (project.remainingDuration <= 0) {
+                        completeProject(project);
+                    }
+                }
+
+                // Check deadline
+                if (gameState.week >= project.deadline && project.remainingDuration > 0) {
+                    failProject(project);
+                }
+            });
+        }
+
+        function completeProject(project) {
+            gameState.budget += project.payment;
+            gameState.reputation += 10;
+            
+            // Unassign employees
+            project.assignedEmployees.forEach(empId => {
+                const emp = gameState.employees.find(e => e.id === empId);
+                if (emp) emp.assignedProject = null;
+            });
+
+            logEvent(`✅ Project "${project.title}" completed! Earned $${project.payment.toLocaleString()}`);
+            gameState.projects = gameState.projects.filter(p => p.id !== project.id);
+        }
+
+        function failProject(project) {
+            gameState.reputation -= 15;
+            gameState.budget -= Math.floor(project.payment * 0.2); // Fine
+            
+            // Unassign employees
+            project.assignedEmployees.forEach(empId => {
+                const emp = gameState.employees.find(e => e.id === empId);
+                if (emp) emp.assignedProject = null;
+            });
+
+            logEvent(`❌ Project "${project.title}" failed! Fine: $${Math.floor(project.payment * 0.2).toLocaleString()}`);
+            gameState.projects = gameState.projects.filter(p => p.id !== project.id);
+        }
+
+        function showHiring() {
+            const maxHires = gameState.employees.length > 20 ? 5 : 3;
+            const candidates = [];
+            
+            for (let i = 0; i < maxHires; i++) {
+                candidates.push(createEmployee());
+            }
+
+            const candidatesHtml = candidates.map(candidate => `
+                <div class="card" onclick="hireEmployee('${candidate.id}', ${JSON.stringify(candidate).replace(/"/g, '&quot;')})">
+                    <div class="employee-info">
+                        <h4>${candidate.name}</h4>
+                        <div class="skills">
+                            Skills: ${candidate.competencies.map(s => `<span class="competency-badge">${s}</span>`).join('')}
+                        </div>
+                        <div class="skills">
+                            Soft Skills: ${candidate.softSkills.join(', ')}
+                        </div>
+                        <div style="margin-top: 8px; font-weight: bold;">Salary: $${candidate.salary.toLocaleString()}/week</div>
+                    </div>
+                </div>
+            `).join('');
+
+            document.getElementById('candidates').innerHTML = candidatesHtml;
+            document.getElementById('hiringModal').classList.remove('hidden');
+        }
+
+        function hireEmployee(candidateId, candidateData) {
+            if (gameState.budget < candidateData.salary * 4) {
+                logEvent(`❌ Cannot hire ${candidateData.name} - insufficient budget for 4 weeks salary`);
+                return;
+            }
+
+            gameState.employees.push(candidateData);
+            logEvent(`✅ Hired ${candidateData.name} for $${candidateData.salary.toLocaleString()}/week`);
+            closeHiring();
+            updateDisplay();
+        }
+
+        function closeHiring() {
+            document.getElementById('hiringModal').classList.add('hidden');
+        }
+
+        function showTender() {
+            if (gameState.week % 4 !== 0) return;
+
+            const tenderClient = {
+                name: generateRandomName().split(' ')[1] + ' Industries',
+                preferences: getRandomSkills(3),
+                budget: Math.floor(Math.random() * 50000) + 30000
+            };
+
+            document.getElementById('tenderDescription').textContent = 
+                `${tenderClient.name} is looking for a digital agency. Guess their top 3 priorities to win this client!`;
+
+            const guessHtml = competencies.map(skill => `
+                <label style="display: block; margin: 5px 0;">
+                    <input type="checkbox" value="${skill}" style="margin-right: 8px;">
+                    ${skill}
+                </label>
+            `).join('');
+
+            document.getElementById('tenderGuess').innerHTML = guessHtml;
+            
+            const choicesHtml = `
+                <button class="choice-btn" onclick="submitTenderGuess('${JSON.stringify(tenderClient).replace(/"/g, '&quot;')}')">
+                    Submit Guess
+                </button>
+                <button class="choice-btn" onclick="closeTender()">
+                    Skip Tender
+                </button>
+            `;
+
+            document.getElementById('tenderChoices').innerHTML = choicesHtml;
+            document.getElementById('tenderModal').classList.remove('hidden');
+        }
+
+        function submitTenderGuess(clientData) {
+            const client = JSON.parse(clientData);
+            const checkboxes = document.querySelectorAll('#tenderGuess input[type="checkbox"]:checked');
+            const guesses = Array.from(checkboxes).map(cb => cb.value);
+
+            if (guesses.length !== 3) {
+                alert('Please select exactly 3 skills!');
+                return;
+            }
+
+            const correctGuesses = guesses.filter(guess => client.preferences.includes(guess)).length;
+            
+            if (correctGuesses >= 2) {
+                gameState.clients.push(client);
+                gameState.reputation += 20;
+                logEvent(`🏆 Won tender! New client: ${client.name} (${correctGuesses}/3 correct guesses)`);
+                generateClientBrief(client);
+            } else {
+                gameState.reputation -= 5;
+                logEvent(`❌ Lost tender to ${client.name} (${correctGuesses}/3 correct guesses)`);
+            }
+
+            closeTender();
+            updateDisplay();
+        }
+
+        function generateClientBrief(client) {
+            const brief = {
+                id: Math.random().toString(36).substr(2, 9),
+                title: `Exclusive Project for ${client.name}`,
+                requiredSkills: client.preferences,
+                duration: Math.floor(Math.random() * 3) + 3,
+                payment: client.budget,
+                deadline: gameState.week + Math.floor(Math.random() * 3) + 4,
+                clientName: client.name
+            };
+            gameState.briefs.push(brief);
+        }
+
+        function closeTender() {
+            document.getElementById('tenderModal').classList.add('hidden');
+            document.getElementById('tenderBtn').disabled = true;
+            document.getElementById('tenderBtn').textContent = '🏆 Join Tender (Week 4)';
+        }
+
+        function startAgencyProject() {
+            if (gameState.budget < 15000) {
+                logEvent('❌ Need $15,000 to start an agency project');
+                return;
+            }
+
+            gameState.budget -= 15000;
+            const project = {
+                id: Math.random().toString(36).substr(2, 9),
+                title: 'Agency Innovation Project',
+                requiredSkills: getRandomSkills(4),
+                totalDuration: 6,
+                remainingDuration: 6,
+                payment: 0, // Agency projects don't pay immediately but boost reputation
+                deadline: gameState.week + 8,
+                assignedEmployees: [],
+                status: 'agency',
+                isAgencyProject: true
+            };
+
+            gameState.projects.push(project);
+            logEvent(`🔬 Started agency project: "${project.title}"`);
+            updateDisplay();
+        }
+
+        // Events System
+        function initializeEventStack() {
+            gameState.eventStack = [
+                {
+                    title: 'Skill Boost Workshop',
+                    description: 'A workshop opportunity arises that could boost your team\'s skills.',
+                    choices: [
+                        {
+                            text: 'Invest $5,000 in workshop',
+                            cost: 5000,
+                            effectId: 'workshop_invest'
+                        },
+                        {
+                            text: 'Skip the workshop',
+                            cost: 0,
+                            effectId: 'workshop_skip'
+                        }
+                    ]
+                },
+                {
+                    title: 'Economic Boom',
+                    description: 'The market is booming! All project payments increased by 50% this week.',
+                    choices: [
+                        {
+                            text: 'Take advantage of the boom',
+                            cost: 0,
+                            effectId: 'economic_boom'
+                        }
+                    ]
+                },
+                {
+                    title: 'Talent Shortage',
+                    description: 'Industry-wide talent shortage makes hiring more expensive.',
+                    choices: [
+                        {
+                            text: 'Accept higher costs',
+                            cost: 0,
+                            effectId: 'talent_shortage'
+                        }
+                    ]
+                },
+                {
+                    title: 'Client Bankruptcy',
+                    description: 'One of your potential clients went bankrupt!',
+                    choices: [
+                        {
+                            text: 'Find replacement clients',
+                            cost: 2000,
+                            effectId: 'bankruptcy_replace'
+                        },
+                        {
+                            text: 'Accept the loss',
+                            cost: 0,
+                            effectId: 'bankruptcy_accept'
+                        }
+                    ]
+                },
+                {
+                    title: 'Tech Conference',
+                    description: 'Opportunity to attend a major tech conference.',
+                    choices: [
+                        {
+                            text: 'Send team to conference ($8,000)',
+                            cost: 8000,
+                            effectId: 'conference_attend'
+                        },
+                        {
+                            text: 'Skip the conference',
+                            cost: 0,
+                            effectId: 'conference_skip'
+                        }
+                    ]
+                },
+
+            ];
+        }
+
+        function executeEventEffect(effectId) {
+            switch(effectId) {
+                case 'workshop_invest':
+                    gameState.employees.forEach(emp => {
+                        if (Math.random() < 0.5) {
+                            const newSkill = competencies[Math.floor(Math.random() * competencies.length)];
+                            if (!emp.competencies.includes(newSkill)) {
+                                emp.competencies.push(newSkill);
+                            }
+                        }
+                    });
+                    logEvent('📚 Workshop completed! Some employees gained new skills');
+                    break;
+                    
+                case 'workshop_skip':
+                    logEvent('📚 Workshop opportunity skipped');
+                    break;
+                    
+                case 'economic_boom':
+                    gameState.briefs.forEach(brief => brief.payment = Math.floor(brief.payment * 1.5));
+                    gameState.projects.forEach(project => project.payment = Math.floor(project.payment * 1.5));
+                    logEvent('💰 Economic boom! All payments increased by 50%');
+                    break;
+                    
+                case 'talent_shortage':
+                    logEvent('💸 Hiring costs increased due to talent shortage');
+                    break;
+                    
+                case 'bankruptcy_replace':
+                    if (gameState.briefs.length > 0) {
+                        gameState.briefs.splice(0, 1);
+                    }
+                    generateBriefs();
+                    logEvent('💼 Found replacement clients after bankruptcy');
+                    break;
+                    
+                case 'bankruptcy_accept':
+                    if (gameState.briefs.length > 0) {
+                        gameState.briefs.splice(0, 1);
+                    }
+                    gameState.reputation -= 5;
+                    logEvent('📉 Lost potential client to bankruptcy');
+                    break;
+                    
+                case 'conference_attend':
+                    gameState.reputation += 15;
+                    gameState.employees.forEach(emp => emp.motivation = Math.min(100, emp.motivation + 10));
+                    logEvent('🎯 Conference attendance boosted reputation and motivation');
+                    break;
+                    
+                case 'conference_skip':
+                    logEvent('🎯 Conference opportunity passed');
+                    break;
+                    
+                case 'pandemic_invest':
+                    gameState.employees.forEach(emp => emp.motivation = Math.min(100, emp.motivation + 15));
+                    logEvent('🏠 Remote tools investment improved team morale');
+                    break;
+                    
+                case 'pandemic_reduce':
+                    gameState.employees.forEach(emp => {
+                        emp.salary = Math.floor(emp.salary * 0.9);
+                        emp.motivation = Math.max(0, emp.motivation - 10);
+                    });
+                    logEvent('📉 Cost reduction affected team morale');
+                    break;
+                    
+                default:
+                    logEvent('❓ Unknown event effect');
+            }
+        }
+
+        function triggerEvent() {
+            if (gameState.eventStack.length === 0) return;
+
+            const event = gameState.eventStack.pop();
+            showEventPopup(event);
+        }
+
+        function showEventPopup(event) {
+            document.getElementById('eventTitle').textContent = event.title;
+            document.getElementById('eventDescription').textContent = event.description;
+            
+            const choicesHtml = event.choices.map((choice, index) => `
+                <button class="choice-btn" onclick="makeEventChoice(${index}, '${JSON.stringify(event).replace(/"/g, '&quot;')}')">
+                    ${choice.text} ${choice.cost > 0 ? `(-${choice.cost.toLocaleString()})` : ''}
+                </button>
+            `).join('');
+
+            document.getElementById('eventChoices').innerHTML = choicesHtml;
+            document.getElementById('eventPopup').classList.remove('hidden');
+        }
+
+        let currentEvent = null;
+
+        function makeEventChoice(choiceIndex) {
+            if (!currentEvent) return;
+            
+            const choice = currentEvent.choices[choiceIndex];
+
+            if (gameState.budget >= choice.cost) {
+                gameState.budget -= choice.cost;
+                executeEventEffect(choice.effectId);
+            } else {
+                logEvent('❌ Insufficient budget for this choice');
+            }
+
+            closeEventPopup();
+            updateDisplay();
+        }
+
+        function closeEventPopup() {
+            document.getElementById('eventPopup').classList.add('hidden');
+            currentEvent = null; // Clear the current event
+        }
+
+        function updateDisplay() {
+            // Update stats
+            document.getElementById('week').textContent = gameState.week;
+            document.getElementById('budget').textContent = `${gameState.budget.toLocaleString()}`;
+            document.getElementById('reputation').textContent = gameState.reputation;
+            document.getElementById('employeeCount').textContent = gameState.employees.length;
+
+            // Update employees
+            const employeesHtml = gameState.employees.map(emp => {
+                const project = gameState.projects.find(p => p.id === emp.assignedProject);
+                const projectName = project ? project.title : 'Unassigned';
+                const isAssigned = emp.assignedProject !== null;
+
+                return `
+                    <div class="card employee-card">
+                        <div class="employee-info">
+                            <h4>${emp.name}</h4>
+                            <div class="skills">
+                                Skills: ${emp.competencies.map(s => `<span class="competency-badge">${s}</span>`).join('')}
+                            </div>
+                            <div class="skills">Soft: ${emp.softSkills.join(', ')}</div>
+                            <div class="skills">Salary: ${emp.salary.toLocaleString()}/week | Motivation: ${emp.motivation}%</div>
+                            <div class="skills">Status: ${projectName}</div>
+                        </div>
+                        <div class="action-buttons">
+                            <button class="small-btn" onclick="developSkill('${emp.id}')" ${gameState.budget < 1000 ? 'disabled' : ''}>
+                                Develop ($1K)
+                            </button>
+                            ${!isAssigned ? `<button class="small-btn" onclick="showProjectAssignment('${emp.id}')">Assign</button>` : 
+                              `<button class="small-btn" onclick="unassignEmployee('${emp.id}')">Unassign</button>`}
+                            <button class="small-btn" onclick="fireEmployee('${emp.id}')">Fire</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            document.getElementById('employees').innerHTML = employeesHtml || '<p>No employees hired yet.</p>';
+
+            // Update projects
+            const projectsHtml = gameState.projects.map(project => {
+                const progress = ((project.totalDuration - project.remainingDuration) / project.totalDuration) * 100;
+                const assignedNames = project.assignedEmployees.map(empId => {
+                    const emp = gameState.employees.find(e => e.id === empId);
+                    return emp ? emp.name : 'Unknown';
+                });
+
+                return `
+                    <div class="card project-card">
+                        <h4>${project.title} ${project.isAgencyProject ? '🔬' : ''}</h4>
+                        <div class="project-details">
+                            Required: ${project.requiredSkills.map(s => `<span class="competency-badge">${s}</span>`).join('')}
+                        </div>
+                        <div class="project-details">
+                            Payment: ${project.payment.toLocaleString()} | Deadline: Week ${project.deadline}
+                        </div>
+                        <div class="project-details">
+                            Assigned: ${assignedNames.join(', ') || 'None'}
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${progress}%"></div>
+                        </div>
+                        <div style="text-align: center; margin-top: 5px; font-size: 0.8rem;">
+                            ${Math.max(0, project.remainingDuration).toFixed(1)} weeks remaining
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            document.getElementById('projects').innerHTML = projectsHtml || '<p>No active projects.</p>';
+
+            // Update briefs
+            const briefsHtml = gameState.briefs.map(brief => `
+                <div class="card">
+                    <h4>${brief.title}</h4>
+                    <div class="project-details">
+                        Required: ${brief.requiredSkills.map(s => `<span class="competency-badge">${s}</span>`).join('')}
+                    </div>
+                    <div class="project-details">
+                        Duration: ${brief.duration} weeks | Payment: ${brief.payment.toLocaleString()}
+                    </div>
+                    <div class="project-details">
+                        Deadline: Week ${brief.deadline}
+                    </div>
+                    <button class="small-btn" onclick="acceptBrief('${brief.id}')" style="margin-top: 8px;">
+                        Accept Project
+                    </button>
+                </div>
+            `).join('');
+            document.getElementById('briefs').innerHTML = briefsHtml || '<p>No briefs available.</p>';
+
+            // Check win conditions
+            checkWinConditions();
+        }
+
+        function showProjectAssignment(employeeId) {
+            const availableProjects = gameState.projects.filter(p => p.assignedEmployees.length < 5);
+            if (availableProjects.length === 0) {
+                logEvent('No projects available for assignment');
+                return;
+            }
+
+            const projectsHtml = availableProjects.map(project => `
+                <button class="choice-btn" onclick="assignEmployee('${employeeId}', '${project.id}'); closeEventPopup();">
+                    ${project.title}
+                </button>
+            `).join('');
+
+            document.getElementById('eventTitle').textContent = 'Assign Employee to Project';
+            document.getElementById('eventDescription').textContent = 'Choose a project for this employee:';
+            document.getElementById('eventChoices').innerHTML = projectsHtml + 
+                '<button class="choice-btn" onclick="closeEventPopup()">Cancel</button>';
+            document.getElementById('eventPopup').classList.remove('hidden');
+        }
+
+        function checkWinConditions() {
+            // Check various win/lose conditions
+            if (gameState.budget < -20000) {
+                endGame('💸 Game Over: Your agency went bankrupt!');
+                return;
+            }
+
+            if (gameState.reputation <= 0) {
+                endGame('📉 Game Over: Your agency lost all reputation!');
+                return;
+            }
+
+            if (gameState.employees.length === 0) {
+                endGame('👥 Game Over: No employees left!');
+                return;
+            }
+
+            // Win conditions
+            if (gameState.budget > 500000 && gameState.reputation > 80) {
+                if (confirm('🏆 Congratulations! You\'ve built a super successful agency! Continue playing?')) {
+                    gameState.goals.superRevenue = true;
+                    logEvent('🏆 Achievement Unlocked: Super Revenue!');
+                } else {
+                    endGame('🏆 Victory: Super Successful Agency!');
+                    return;
+                }
+            }
+
+            if (gameState.employees.length > 50) {
+                if (confirm('🏢 Your agency has grown massive! Continue expanding?')) {
+                    logEvent('🏢 Achievement Unlocked: Mega Agency!');
+                } else {
+                    endGame('🏢 Victory: Built a Massive Agency Empire!');
+                    return;
+                }
+            }
+        }
+
+        function endGame(message) {
+            alert(message);
+            if (confirm('Would you like to start a new game?')) {
+                location.reload();
+            }
+        }
+
+        function logEvent(message) {
+            const logDiv = document.getElementById('gameLog');
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.textContent = `Week ${gameState.week}: ${message}`;
+            logDiv.appendChild(entry);
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+
+        // Initialize the game when page loads
+        window.onload = function() {
+            initGame();
+        };
+    </script>
+</body>
+</html>
